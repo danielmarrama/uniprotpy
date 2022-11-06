@@ -16,6 +16,11 @@ def get_proteomes(taxon_dict):
     url = 'https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes'
 
     for taxon_id, proteome_id in taxon_dict.items():
+
+        # if file exists in directory already, skip it
+        if taxon_id + '.fasta' in os.listdir(directory):
+            continue
+
         # check Eukaryota first
         r = requests.get(url + '/Eukaryota/' + proteome_id + '/' + proteome_id + '_' + taxon_id + '.fasta.gz', stream=True)
         
@@ -35,8 +40,11 @@ def get_proteomes(taxon_dict):
                     if r.status_code == 404:
                         get_protein_entries([taxon_id])
         
-        with open(directory + taxon_id + '.fasta', 'wb') as f1:
-            f1.write(gzip.open(r.raw, 'rb').read())
+            try:
+                with open(directory + taxon_id + '.fasta', 'wb') as f1:
+                    f1.write(gzip.open(r.raw, 'rb').read())
+            except gzip.BadGzipFile:
+                get_protein_entries([taxon_id])
 
     return 0
 
@@ -46,6 +54,11 @@ def get_protein_entries(taxons):
     Get collection of proteins for taxons with no proteome in UniProt.
     '''
     for taxon in taxons:
+        
+        # if file exists in directory already, skip it
+        if taxon + '.fasta' in os.listdir(directory):
+            continue
+        
         r = requests.get('https://rest.uniprot.org/uniprotkb/stream?format=fasta&query=%28taxonomy_id%3A' + taxon + '%29')
         with open(directory + taxon + '.fasta', 'w') as f2:
             f2.write(r.text)
