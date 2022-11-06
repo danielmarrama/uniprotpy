@@ -33,8 +33,7 @@ def get_proteomes(taxon_dict):
                     
                     # if found nowhere, move on
                     if r.status_code == 404:
-                        print('Did not retrieve:', taxon_id, 'Proteome ID:', proteome_id)
-                        continue
+                        get_protein_entries([taxon_id])
         
         with open(directory + taxon_id + '.fasta', 'wb') as f1:
             f1.write(gzip.open(r.raw, 'rb').read())
