@@ -4,28 +4,44 @@ import re
 import pandas as pd
 
 from Bio import SeqIO
+from anytree import Node, RenderTree
 
-data = []
-for protein in list(SeqIO.parse('9606.fasta', 'fasta')):
-  sp_or_tr = protein_id = protein.description.split('|')[0]
-  protein_id = protein.description.split('|')[1]
-  protein_name = re.search(' (.*) OS', protein.description).group(1)
-  species = re.search('OS=(.*) OX=', protein.description).group(1)
-  taxon = 9606
-  try:
-    gene = re.search('GN=(.*?) ', protein.description).group(1)
-  except AttributeError:
-    gene = ''
-  try:
-    pe_level = int(re.search('PE=(.*?) ', protein.description).group(1))
-  except AttributeError:
-    pe_level = ''
 
-  seq = protein.seq
+def add_nodes(nodes, parent, child):
+    if parent not in nodes:
+        nodes[parent] = Node(parent)  
+    if child not in nodes:
+        nodes[child] = Node(child)
+    nodes[child].parent = nodes[parent]
 
-  data.append([sp_or_tr, protein_id, protein_name, species, taxon, gene, pe_level, str(seq)])
+def create_protein_tree(proteome):
+  proteins = list(SeqIO.parse(proteome, 'fasta'))
 
-columns = ['sp_or_tr', 'protein_id', 'protein_name', 'species', 'taxon', 'gene', 'pe_level', 'seq']
-df = pd.DataFrame(data, columns=columns)
+  data = []
+  for protein in proteins:
+    try:
+      gene = re.search('GN=(.*?) ', protein.description).group(1)
+    except AttributeError:
+      try:
+        gene = re.search('GN=(.*?)$', protein.description).group(1)
+      except AttributeError:
+        gene = ''
+    
+    data.append([protein.id.split('|')[0], gene, protein.id.split('|')[1], str(protein.seq)])
+  
+  df = pd.DataFrame(data, columns=['db', 'gene', 'id', 'seq'])
 
-df.to_csv('9606.csv')
+  nodes = {}
+  for parent, child in zip(df['gene'],df['id']):
+      add_nodes(nodes, parent, child)
+
+  with open('protein_tree.txt', 'w') as f:
+    roots = list(df[~df['gene'].isin(df['id'])]['gene'].unique())
+    for root in roots:    
+        for pre, _, node in RenderTree(nodes[root]):
+            f.write("%s%s" % (pre, node.name))
+            f.write('\n')
+
+if __name__ == '__main__':
+  proteome = '9606.fasta'
+  create_protein_tree(proteome)
