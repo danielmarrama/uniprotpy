@@ -11,3 +11,4 @@ For something like [openvax/pyensembl](https://github.com/openvax/pyensembl) wit
 - Get metadata (protein ID, name, gene, # of isoforms, etc.) for entries.
 - Retrieve proteomes via proteome ID or select "best" proteome based on taxon ID.
 - Query proteomes for a protein by ID, name, seq, or peptide unit.
+- Retrieve taxonomy branches (parent, siblings, children) with taxon ID
