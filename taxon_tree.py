@@ -39,7 +39,25 @@ def traverse_tree(taxon_id):
   return {taxon_id: child_results}
 
 
-# start with the Homo genus taxon (9605)
-taxon_id = 9605
-taxonomy_tree = traverse_tree(taxon_id)
-print(taxonomy_tree)
+def main():
+  import argparse
+
+  parser = argparse.ArgumentParser()
+  parser.add_argument('-t', '--taxon_id', type=int, help='Taxon ID')
+  parser.add_argument('-p', '--pickle', action='store_true', help='Pickle output.')
+
+  args = parser.parse_args()
+  taxon_id = args.taxon_id
+
+  taxonomy_tree = traverse_tree(taxon_id)
+
+  if args.pickle:
+    import pickle
+    with open('taxonomy_tree.pkl', 'wb') as f:
+      pickle.dump(taxonomy_tree, f)
+  
+  print('Taxon tree:')
+  print(taxonomy_tree)
+
+if __name__ == '__main__':
+  main()
