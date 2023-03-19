@@ -1,4 +1,4 @@
-# uniprotpy
+# UniProtPy
 
 Python library that interfaces with UniProt API.
 
