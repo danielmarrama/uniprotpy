@@ -39,12 +39,33 @@ def traverse_tree(taxon_id):
   return {taxon_id: child_results}
 
 
+def create_taxon_tree(tree, prefix="", file=None):
+  if isinstance(tree, list):
+    for i, item in enumerate(tree):
+      is_last = i == len(tree) - 1
+      if isinstance(item, dict):
+        for k, v in item.items():
+          print(f"{prefix}{'└──' if is_last else '├──'}{k}", file=file)
+          create_taxon_tree(v, f"{prefix}{'    ' if is_last else '│   '}", file)
+      else:
+        print(f"{prefix}{'└──' if is_last else '├──'}{item}", file=file)
+  
+  elif isinstance(tree, dict):
+    for i, (key, value) in enumerate(tree.items()):
+      is_last = i == len(tree) - 1
+      print(f"{prefix}{'└──' if is_last else '├──'}{key}", file=file)
+      create_taxon_tree(value, f"{prefix}{'    ' if is_last else '│   '}", file)
+
+          
+
+
 def main():
   import argparse
 
   parser = argparse.ArgumentParser()
   parser.add_argument('-t', '--taxon_id', type=int, help='Taxon ID')
-  parser.add_argument('-p', '--pickle', action='store_true', help='Pickle output.')
+  parser.add_argument('-p', '--pickle', action='store_true', help='Pickle tree output.')
+  parser.add_argument('-o', '--output', action='store_true', help='Output tree file.')
 
   args = parser.parse_args()
   taxon_id = args.taxon_id
@@ -56,8 +77,13 @@ def main():
     with open('taxonomy_tree.pkl', 'wb') as f:
       pickle.dump(taxonomy_tree, f)
   
+  if args.output:
+    with open(f'{taxon_id}_taxonomy_tree.txt', 'w') as f:
+      create_taxon_tree(taxonomy_tree, file=f)
+
   print('Taxon tree:')
   print(taxonomy_tree)
+  create_taxon_tree(taxonomy_tree)
 
 if __name__ == '__main__':
   main()
