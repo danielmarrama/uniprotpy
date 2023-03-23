@@ -51,29 +51,27 @@ class ProteomeSelector:
     if self.proteome_list['isRepresentativeProteome'].any():
       proteome_type = 'Representative'
       self.proteome_list = self.proteome_list[self.proteome_list['isRepresentativeProteome']]
-      proteome_id, proteome_taxon = self._get_proteome_with_proteins()
-      self._get_gp_proteome_to_fasta(proteome_id, proteome_taxon)
+      proteome_id, proteome_taxon = self._get_proteome_with_most_proteins()
+      # self._get_gp_proteome_to_fasta(proteome_id, proteome_taxon)
     
     elif self.proteome_list['isReferenceProteome'].any():
       proteome_type = 'Reference'
       self.proteome_list = self.proteome_list[self.proteome_list['isReferenceProteome']]
-      proteome_id, proteome_taxon = self._get_proteome_with_proteins()
-      self._get_gp_proteome_to_fasta(proteome_id, proteome_taxon)
+      proteome_id, proteome_taxon = self._get_proteome_with_most_proteins()
+      # self._get_gp_proteome_to_fasta(proteome_id, proteome_taxon)
 
     elif 'redundantTo' not in self.proteome_list.columns:
       proteome_type = 'Other'
-      proteome_id, proteome_taxon = self._get_proteome_with_proteins()
+      proteome_id, proteome_taxon = self._get_proteome_with_most_proteins()
     
     elif self.proteome_list['redundantTo'].isna().any():
       proteome_type = 'Non-redundant'
       self.proteome_list = self.proteome_list[self.proteome_list['redundantTo'].isna()]
-      proteome_id, proteome_taxon = self._get_proteome_with_proteins()
+      proteome_id, proteome_taxon = self._get_proteome_with_most_proteins()
     
     else:
       proteome_type = 'Other'
-      proteome_id, proteome_taxon = self._get_proteome_with_proteins()
-    
-    self._remove_other_proteomes(proteome_id)
+      proteome_id, proteome_taxon = self._get_proteome_with_most_proteins()
     
     # sanity check to make sure proteome.fasta is not empty
     if os.stat(f'./data/{self.taxon_id}/proteome.fasta').st_size == 0:
@@ -92,9 +90,9 @@ class ProteomeSelector:
     from Bio import SeqIO
 
     # read in the FASTA file and then get the gene priority IDs if they exist
-    proteins = list(SeqIO.parse(f'{self.species_path}/proteome.fasta', 'fasta'))
+    proteins = list(SeqIO.parse(f'data/{self.taxon_id}/proteome.fasta', 'fasta'))
 
-    gp_proteome_path = f'{self.species_path}/gp_proteome.fasta'
+    gp_proteome_path = f'data/{self.taxon_id}/gp_proteome.fasta'
     if os.path.isfile(gp_proteome_path):
       gp_ids = [str(protein.id.split('|')[1]) for protein in list(SeqIO.parse(gp_proteome_path, 'fasta'))]
     else:
@@ -123,7 +121,7 @@ class ProteomeSelector:
       proteome_data.append([protein.id.split('|')[0], gene, uniprot_id, gp, pe_level, str(protein.seq)])
     
     columns = ['Database', 'Gene Symbol', 'UniProt ID', 'Gene Priority', 'Protein Existence Level', 'Sequence']
-    pd.DataFrame(proteome_data, columns=columns).to_csv(f'{self.species_path}/proteome.csv', index=False)
+    pd.DataFrame(proteome_data, columns=columns).to_csv(f'data/{self.taxon_id}/proteome.csv', index=False)
 
   def _get_proteome_list(self):
     """
@@ -162,7 +160,7 @@ class ProteomeSelector:
 
     # loop through all protein batches and write proteins to FASTA file
     for batch in self._get_protein_batches(url):
-      with open(f'{self.species_path}/proteome.fasta', 'a') as f:
+      with open(f'data/{self.taxon_id}/proteome.fasta', 'a') as f:
         f.write(batch.text)
 
   def _get_protein_batches(self, batch_url):
@@ -226,7 +224,7 @@ class ProteomeSelector:
       return
 
     # unzip the request and write the gene priority proteome to a file
-    with open(f'{self.species_path}/gp_proteome.fasta', 'wb') as f:
+    with open(f'data/{self.taxon_id}/gp_proteome.fasta', 'wb') as f:
       f.write(gzip.open(r.raw, 'rb').read())
 
   def _get_proteome_to_fasta(self, proteome_id):
@@ -237,27 +235,21 @@ class ProteomeSelector:
     url = f'https://rest.uniprot.org/uniprotkb/stream?compressed=false&format=fasta&includeIsoform=true&query=(proteome:{proteome_id})'
     r = requests.get(url)
     r.raise_for_status()
-    with open(f'{self.species_path}/{proteome_id}.fasta', 'w') as f:
+    with open(f'data/{self.taxon_id}/proteome.fasta', 'w') as f:
       f.write(r.text)
 
-  def _get_proteome_with_proteins(self):
-    pass
+  def _get_proteome_with_most_proteins(self):
+    """
+    Between UniProt proteome ties, get the proteome with the most proteins.
+    """
+    # get the index of the row with the most proteins using proteinCount
+    proteome_id = self.proteome_list.iloc[self.proteome_list['proteinCount'].idxmax()]['upid']
+    proteome_taxon = self.proteome_list.iloc[self.proteome_list['proteinCount'].idxmax()]['taxonomy']
 
-  def _remove_other_proteomes(self, proteome_id):
-    """
-    Remove the proteome FASTA files that are not the chosen proteome for that
-    species. Also, remove the .db files and rename the chosen proteome to 
-    "proteome.fasta".
-    """
-    proteome_list_to_remove = self.proteome_list[self.proteome_list['upid'] != proteome_id]
-    for i in list(proteome_list_to_remove['upid']):
-      os.remove(f'{self.species_path}/{i}.fasta')
-      os.remove(f'{self.species_path}/{i}.db')
-    
-    # rename the chosen proteome to proteome.fasta and remove the .db file
-    os.rename(f'{self.species_path}/{proteome_id}.fasta', f'{self.species_path}/proteome.fasta')
-    if self.num_of_proteomes > 2: # there is only a .db file if there is more than one proteome
-      os.remove(f'{self.species_path}/{proteome_id}.db')
+    # write the proteome to a file
+    self._get_proteome_to_fasta(proteome_id)
+
+    return proteome_id, proteome_taxon
 
 
 def main():
