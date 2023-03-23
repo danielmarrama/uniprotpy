@@ -8,9 +8,9 @@ def parse_arguments():
   parser.add_argument(
     'action',
     choices=(
-      'download',
+      'get-best-proteome',
     ),
-    help='\"download\" will download the best proteome from UniProt for a given '
+    help='\"get-best-proteome\" will download the best proteome from UniProt for a given '
          'taxon ID of a species.'
   )
   args = parser.parse_args()
@@ -20,7 +20,7 @@ def parse_arguments():
 def run():
   args = parse_arguments()
   taxon_id = args.taxon_id
-  if args.action == 'download':
+  if args.action == 'get-best-proteome':
     ProteomeSelector(taxon_id).select_proteome()
   else:
     raise ValueError('Invalid action.')

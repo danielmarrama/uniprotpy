@@ -12,6 +12,17 @@ The REST API has changed as of 2022. Many of the ways to extract data from UniPr
 2. Store and query large data using a local database.
 3. Manipulate and output data in many standard formats.
 
+### Installation
+
+```bash
+pip install uniprotpy
+```
+
+### Getting a proteome for a species
+```bash
+uniprotpy get-best-proteome --taxon-id 9606
+```
+
 ### TODO
 
 - Retrieve individual entries in all supported formats.
