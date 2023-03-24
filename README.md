@@ -1,6 +1,6 @@
 # UniProtPy
 
-Python library that interfaces with UniProt API.
+A Python library that interfaces with UniProt.
 
 For something like [openvax/pyensembl](https://github.com/openvax/pyensembl) with UniProt.
 
@@ -20,7 +20,7 @@ pip install uniprotpy
 
 ### Getting a proteome for a species
 ```bash
-uniprotpy get-best-proteome --taxon-id 9606
+uniprotpy get-best-proteome --taxon_id 9606
 ```
 
 ### TODO
