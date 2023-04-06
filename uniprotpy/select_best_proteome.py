@@ -226,7 +226,7 @@ class ProteomeSelector:
     # unzip the request and write the gene priority proteome to a file
     with open(f'data/{self.taxon_id}/gp_proteome.fasta', 'wb') as f:
       f.write(gzip.open(r.raw, 'rb').read())
-
+  
   def _get_proteome_to_fasta(self, proteome_id):
     """
     Get the FASTA file for a proteome from UniProt API.
