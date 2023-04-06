@@ -18,7 +18,12 @@ The REST API has changed as of 2022. Many of the ways to extract data from UniPr
 pip install uniprotpy
 ```
 
-### Getting a proteome for a species
+### Getting a proteome by proteome ID
+```bash
+uniprotpy get-proteome --proteome_id UP000005640
+```
+
+### Getting the best proteome for a taxon ID
 ```bash
 uniprotpy get-best-proteome --taxon_id 9606
 ```
