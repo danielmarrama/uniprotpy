@@ -16,11 +16,11 @@ def create_protein_tree(proteome):
   proteins = list(SeqIO.parse(proteome, 'fasta'))
 
   # get UniProt IDs for one protein per gene proteome
-  gp_ids = [str(x.id.split('|')[1]) for x in list(SeqIO.parse(gp_proteome, 'fasta'))]
+  # TODO: See why this was gp_proteome rather than proteome
+  gp_ids = [str(x.id.split('|')[1]) for x in list(SeqIO.parse(proteome, 'fasta'))]
 
   data = []
   for protein in proteins:
-
     # get gene symbol from FASTA file
     try:
       gene = re.search('GN=(.*?) ', protein.description).group(1)
