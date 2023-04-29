@@ -5,7 +5,7 @@ from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
 import re
 
-from uniprotpy.parser import parse_proteome
+from uniprotpy.parser import parse_proteome, find_pattern
 
 test_result_expected = {
     "|A0A075B6G3|": {
@@ -33,3 +33,6 @@ def test_parse_proteome():
         # Call the parse_proteome function with the mocked objects
         result = parse_proteome("dummy_path")
         assert result == test_result_expected
+
+def test_find_pattern():
+    assert find_pattern(re.compile(r"\|([^|]*)\|"), "|ABCD|") == "|ABCD|"

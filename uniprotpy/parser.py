@@ -12,14 +12,28 @@ regexes = {
         'gene_priority': re.compile(r"GP=(.+?)\s"),    # between GP= and space
 }
 
-def find_pattern(pattern, string):
+def find_pattern(pattern, string) -> str:
+    """Find a pattern in a string and return the first match.
+    Args:
+        pattern: a compiled regex pattern
+        string: a string to search for the pattern
+    
+    Returns:
+        The first match of the pattern in the string, or an empty string if no match is found.
+    """
     match = re.search(pattern, string)
     if match:
         return match.group()
     else:
         return ""
 
-def parse_proteome(proteome_file):
+def parse_proteome(proteome_file) -> dict:
+    """Parse out a proteome FASTA file and return a protein dictionary    
+    Args:
+        proteome_file: path to a proteome file in FASTA format.
+        
+    Returns:
+        A dictionary mapping protein IDs to keyword-value pairs."""
     proteome_dict = {}
     for record in SeqIO.parse(proteome_file, "fasta"):
         protein_id = find_pattern(regexes['protein_id'], record.description)
