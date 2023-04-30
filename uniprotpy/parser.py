@@ -46,6 +46,7 @@ def parse_proteome(proteome_file) -> dict:
         gene_priority = find_pattern(regexes['gene_priority'], record.description)
         
         proteome_dict[protein_id] = {
+            "protein_id": protein_id,
             "protein_name": protein_name,
             "species": species,
             "taxon_id": taxon_id,

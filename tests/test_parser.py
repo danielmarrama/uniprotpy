@@ -8,18 +8,16 @@ import re
 from uniprotpy.parser import parse_proteome, find_pattern
 
 test_result_expected = {
-    "|A0A075B6G3|": {
-        "protein_name": " Dystrophin OS",
-        "species": "OS=Homo sapiens OX",
-        "taxon_id": "OX=9606 ",
-        "gene": "GN=DMD ",
-        "pe_level": "PE=1 ",
-        "sequence_version": "",
-        "gene_priority": "",
-        "sequence": "MLWWEEVEDCYEREDVQKKTFTKWVNAQFSKFGKQHIENLFSDLQDGRRLLDLLEGLTGQ",
-    }
+    "protein_id": "|A0A075B6G3|",
+    "protein_name": " Dystrophin OS",
+    "species": "OS=Homo sapiens OX",
+    "taxon_id": "OX=9606 ",
+    "gene": "GN=DMD ",
+    "pe_level": "PE=1 ",
+    "sequence_version": "",
+    "gene_priority": "",
+    "sequence": "MLWWEEVEDCYEREDVQKKTFTKWVNAQFSKFGKQHIENLFSDLQDGRRLLDLLEGLTGQ",
 }
-
 
 def test_parse_proteome():
     mock_seq_record = SeqRecord(
@@ -32,7 +30,7 @@ def test_parse_proteome():
     with patch("Bio.SeqIO.parse", mock_seqio_parse):
         # Call the parse_proteome function with the mocked objects
         result = parse_proteome("dummy_path")
-        assert result == test_result_expected
+        assert result[test_result_expected["protein_id"]] == test_result_expected
 
 def test_find_pattern():
     assert find_pattern(re.compile(r"\|([^|]*)\|"), "|ABCD|") == "|ABCD|"
