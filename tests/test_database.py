@@ -17,15 +17,14 @@ def database(temp_db_url):
     db._init_sqlite()
     return db
 
-
 test_data = {
-    "protein_id": "|A0A075B6G3|",
-    "protein_name": " Dystrophin OS",
-    "species": "OS=Homo sapiens OX",
-    "taxon_id": "OX=9606 ",
-    "gene": "GN=DMD ",
-    "pe_level": "PE=1 ",
-    "sequence_version": "",
+    "protein_id": "A0A075B6G3",
+    "protein_name": "Dystrophin",
+    "species": "Homo sapiens",
+    "taxon_id": "9606",
+    "gene": "DMD",
+    "pe_level": "1 ",
+    "sequence_version": "1",
     "gene_priority": "",
     "sequence": "MLWWEEVEDCYEREDVQKKTFTKWVNAQFSKFGKQHIENLFSDLQDGRRLLDLLEGLTGQ",
 }
@@ -35,4 +34,4 @@ def test_add_protein_entry(database):
 
 def test_get_protein_entry(database):
     result = database.get(test_data["protein_id"]).dict()
-    assert result["protein_id"] == "|A0A075B6G3|"
+    assert result["protein_id"] == "A0A075B6G3"

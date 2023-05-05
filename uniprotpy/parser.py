@@ -1,31 +1,23 @@
 import re
 from Bio import SeqIO
 
-regexes = {
-        'protein_id': re.compile(r"\|([^|]*)\|"),      # between | and |
-        'protein_name': re.compile(r"\s(.+?)\sOS"),    # between first space and space before OS
-        'species': re.compile(r"OS=(.+?)\sOX"),        # between OS= and space before OX (species can have spaces)
-        'taxon_id': re.compile(r"OX=(.+?)\s"),         # between OX= and space
-        'gene': re.compile(r"GN=(.+?)\s"),             # between GN= and space
-        'pe_level': re.compile(r"PE=(.+?)\s"),         # between PE= and space
-        'sequence_version': re.compile(r"SV=(.+?)\s"), # between SV= and space
-        'gene_priority': re.compile(r"GP=(.+?)\s"),    # between GP= and space
-}
+def parse_protein_string(s):
+    pattern = r'^tr\|(\w+)\|(\w+)_\w+\s+(.+) OS=(.+) OX=(\d+) GN=(\w+) PE=(\d+) SV=(\d+)(?: GP=(\d+))?$'
+    match = re.match(pattern, s)
 
-def find_pattern(pattern, string) -> str:
-    """Find a pattern in a string and return the first match.
-    Args:
-        pattern: a compiled regex pattern
-        string: a string to search for the pattern
-    
-    Returns:
-        The first match of the pattern in the string, or an empty string if no match is found.
-    """
-    match = re.search(pattern, string)
     if match:
-        return match.group()
+        return {
+            "protein_id": match.group(2),
+            "protein_name": match.group(3),
+            "species": match.group(4),
+            "taxon_id": match.group(5),
+            "gene": match.group(6),
+            "pe_level": match.group(7),
+            "sequence_version": match.group(8) if match.group(8) else "",
+            "gene_priority": match.group(9) if match.group(9) else "",
+        }
     else:
-        return ""
+        raise ValueError(f"Could not parse protein string: {s}")
 
 def parse_proteome(proteome_file) -> dict:
     """Parse out a proteome FASTA file and return a protein dictionary    
@@ -36,24 +28,8 @@ def parse_proteome(proteome_file) -> dict:
         A dictionary mapping protein IDs to keyword-value pairs."""
     proteome_dict = {}
     for record in SeqIO.parse(proteome_file, "fasta"):
-        protein_id = find_pattern(regexes['protein_id'], record.description)
-        protein_name = find_pattern(regexes['protein_name'], record.description)
-        species = find_pattern(regexes['species'], record.description)
-        taxon_id = find_pattern(regexes['taxon_id'], record.description)
-        gene = find_pattern(regexes['gene'], record.description)
-        pe_level = find_pattern(regexes['pe_level'], record.description)
-        sequence_version = find_pattern(regexes['sequence_version'], record.description)
-        gene_priority = find_pattern(regexes['gene_priority'], record.description)
-        
-        proteome_dict[protein_id] = {
-            "protein_id": protein_id,
-            "protein_name": protein_name,
-            "species": species,
-            "taxon_id": taxon_id,
-            "gene": gene,
-            "pe_level": pe_level,
-            "sequence_version": sequence_version,
-            "gene_priority": gene_priority,
-            "sequence": str(record.seq)
-        }
+        result = parse_protein_string(record.description)
+        protein_id = result["protein_id"]
+        proteome_dict[protein_id] = parse_protein_string(record.description)
+        proteome_dict[protein_id]["sequence"] = str(record.seq)
     return proteome_dict

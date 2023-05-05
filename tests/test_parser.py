@@ -5,16 +5,16 @@ from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
 import re
 
-from uniprotpy.parser import parse_proteome, find_pattern
+from uniprotpy.parser import parse_proteome
 
 test_result_expected = {
-    "protein_id": "|A0A075B6G3|",
-    "protein_name": " Dystrophin OS",
-    "species": "OS=Homo sapiens OX",
-    "taxon_id": "OX=9606 ",
-    "gene": "GN=DMD ",
-    "pe_level": "PE=1 ",
-    "sequence_version": "",
+    "protein_id": "A0A075B6G3",
+    "protein_name": "Dystrophin",
+    "species": "Homo sapiens",
+    "taxon_id": "9606",
+    "gene": "DMD",
+    "pe_level": "1",
+    "sequence_version": "1",
     "gene_priority": "",
     "sequence": "MLWWEEVEDCYEREDVQKKTFTKWVNAQFSKFGKQHIENLFSDLQDGRRLLDLLEGLTGQ",
 }
@@ -31,6 +31,3 @@ def test_parse_proteome():
         # Call the parse_proteome function with the mocked objects
         result = parse_proteome("dummy_path")
         assert result[test_result_expected["protein_id"]] == test_result_expected
-
-def test_find_pattern():
-    assert find_pattern(re.compile(r"\|([^|]*)\|"), "|ABCD|") == "|ABCD|"
