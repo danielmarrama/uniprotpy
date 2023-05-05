@@ -17,7 +17,7 @@ def create_protein_tree(proteome):
 
   # get UniProt IDs for one protein per gene proteome
   # TODO: See why this was gp_proteome rather than proteome
-  gp_ids = [str(x.id.split('|')[1]) for x in list(SeqIO.parse(proteome, 'fasta'))]
+  gp_ids = [str(x.id.split('|')[1]) for x in list(SeqIO.parse(gp_proteome, 'fasta'))]
 
   data = []
   for protein in proteins:
