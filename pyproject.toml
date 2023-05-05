@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "uniprotpy"
+version = "0.0.1"  # Replace with the actual version number
+description = "A Python library that interfaces with UniProt data."
+authors = ["Daniel Marrama <danielmarrama@gmail.com>"]
+readme = "README.md"
+homepage = "https://github.com/danielmarrama/uniprotpy"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pandas = ">=2.0.1"
+biopython = ">=1.5"
+requests = ">=2.29.0"
+sqlalchemy = ">=2.0.11"
+
+[tool.poetry.dev-dependencies]
+# Add development dependencies here
+
+[tool.poetry.scripts]
+uniprotpy = "uniprotpy.shell:run"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
