@@ -7,6 +7,7 @@ import re
 import os
 import pandas as pd
 import requests
+from pathlib import Path
 
 
 class ProteomeSelector:
@@ -16,6 +17,15 @@ class ProteomeSelector:
     # get proteome list for species and count number of proteomes
     self.proteome_list = self._get_proteome_list()
     self.num_of_proteomes = len(self.proteome_list) + 1 # +1 because "all proteins" is also a candidate proteome
+  
+  def download(self, format: str, compressed: bool = False, outdir: str = '.') -> None:
+    """After a proteome is selected from UniProt, download it in a given format.
+
+    Args:
+      format: the file format for the proteome - FASTA, TSV, Excel, JSON, etc.
+      compressed: download as a compressed file.
+      outdir: the directory to download the file to.
+    """
 
   def select_proteome(self):
     """
@@ -36,12 +46,11 @@ class ProteomeSelector:
     If no to all of the above, then get every protein associated with
     the taxon ID using the get_all_proteins method.
     """
-    # if species_dir already exists then return the already selected proteome, else create dir
-    if os.path.exists(f'./data/{self.taxon_id}'):
+    if (Path('.') / 'data' / self.taxon_id / 'proteome.fasta').exists():
       print(f'Proteome already selected for {self.taxon_id}.')
-      return []
+      return None
     else:
-      os.makedirs(f'./data/{self.taxon_id}')
+      (Path('.') / 'data' / self.taxon_id).mkdir(parents=True, exist_ok=True)
 
     # if there is no proteome_list, get all proteins associated with that taxon ID
     if self.proteome_list.empty:
@@ -243,8 +252,8 @@ class ProteomeSelector:
     Between UniProt proteome ties, get the proteome with the most proteins.
     """
     # get the index of the row with the most proteins using proteinCount
-    proteome_id = self.proteome_list.iloc[self.proteome_list['proteinCount'].idxmax()]['upid']
-    proteome_taxon = self.proteome_list.iloc[self.proteome_list['proteinCount'].idxmax()]['taxonomy']
+    proteome_id = self.proteome_list.loc[self.proteome_list['proteinCount'].idxmax()]['upid']
+    proteome_taxon = self.proteome_list.loc[self.proteome_list['proteinCount'].idxmax()]['taxonomy']
 
     # write the proteome to a file
     self._get_proteome_to_fasta(proteome_id)

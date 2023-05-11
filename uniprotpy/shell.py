@@ -1,7 +1,7 @@
 import argparse
 
 from .helpers import proteome_to_fasta
-from .select_best_proteome import ProteomeSelector
+from .proteome_selector import ProteomeSelector
 
 def parse_arguments():
   parser = argparse.ArgumentParser(description='UniProtPy')
