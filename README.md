@@ -1,10 +1,10 @@
 # UniProtPy
 
-A Python library that interfaces with UniProt.
+A Python library that interfaces with UniProt. 
 
 For something like [openvax/pyensembl](https://github.com/openvax/pyensembl) with UniProt.
 
-The REST API has changed as of 2022. Many of the ways to extract data from UniProt is now different and there isn't a clean way to interface with it.
+The REST API has changed as of 2022. Many of the ways to extract data from UniProt is now different and there isn't a clean way to interface with the new API. This library aims to provide a clean interface to access all protein data from UniProt.
 
 
 ### Goals
@@ -12,21 +12,25 @@ The REST API has changed as of 2022. Many of the ways to extract data from UniPr
 2. Store and query large data using a local database.
 3. Manipulate and output data in many standard formats.
 
+
 ### Installation
 
 ```bash
 pip install uniprotpy
 ```
 
+
 ### Getting a proteome by proteome ID
 ```bash
 uniprotpy get-proteome --proteome_id UP000005640
 ```
 
+
 ### Getting the best proteome for a taxon ID
 ```bash
 uniprotpy get-best-proteome --taxon_id 9606
 ```
+
 
 ### TODO
 

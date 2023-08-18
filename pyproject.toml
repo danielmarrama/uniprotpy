@@ -2,7 +2,7 @@
 name = "uniprotpy"
 version = "0.0.1"  # Replace with the actual version number
 description = "A Python library that interfaces with UniProt data."
-authors = ["Daniel Marrama <danielmarrama@gmail.com>"]
+authors = ["Daniel Marrama <danielmarrama@gmail.com>", "Austin Crinklaw <austincrinklaw@gmail.com>"]
 readme = "README.md"
 homepage = "https://github.com/danielmarrama/uniprotpy"
 

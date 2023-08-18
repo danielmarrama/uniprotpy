@@ -12,7 +12,7 @@ def add_nodes(nodes, parent, child):
     nodes[child] = Node(child)
   nodes[child].parent = nodes[parent]
 
-def create_protein_tree(proteome):
+def create_protein_tree(proteome, gp_proteome):
   proteins = list(SeqIO.parse(proteome, 'fasta'))
 
   # get UniProt IDs for one protein per gene proteome
