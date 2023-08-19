@@ -7,6 +7,7 @@ import re
 
 from uniprotpy.parser import parse_proteome
 
+
 test_result_expected = {
     "protein_id": "A0A075B6G3",
     "protein_name": "Dystrophin",
@@ -18,6 +19,7 @@ test_result_expected = {
     "gene_priority": "",
     "sequence": "MLWWEEVEDCYEREDVQKKTFTKWVNAQFSKFGKQHIENLFSDLQDGRRLLDLLEGLTGQ",
 }
+
 
 def test_parse_proteome():
     mock_seq_record = SeqRecord(
