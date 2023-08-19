@@ -16,7 +16,7 @@ test_result_expected = {
     "gene": "DMD",
     "pe_level": "1",
     "sequence_version": "1",
-    "gene_priority": "",
+    "gene_priority": "0",
     "sequence": "MLWWEEVEDCYEREDVQKKTFTKWVNAQFSKFGKQHIENLFSDLQDGRRLLDLLEGLTGQ",
 }
 

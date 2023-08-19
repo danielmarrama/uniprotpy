@@ -1,5 +1,6 @@
 import re
 from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
 
 
 def parse_proteome(proteome_file) -> dict:
@@ -11,28 +12,44 @@ def parse_proteome(proteome_file) -> dict:
         A dictionary mapping protein IDs to keyword-value pairs."""
     proteome_dict = {}
     for record in SeqIO.parse(proteome_file, "fasta"):
-        result = parse_protein_string(record.description)
-        protein_id = result["protein_id"]
-        proteome_dict[protein_id] = parse_protein_string(record.description)
+        protein_data = parse_protein_record(record)
+        protein_id = protein_data["protein_id"]
+        proteome_dict[protein_id] = protein_data
         proteome_dict[protein_id]["sequence"] = str(record.seq)
     return proteome_dict
 
 
-def parse_protein_string(s):
-    pattern = r'^tr\|(\w+)\|(\w+)_\w+\s+(.+) OS=(.+) OX=(\d+) GN=(\w+) PE=(\d+) SV=(\d+)(?: GP=(\d+))?$'
-    match = re.match(pattern, s)
+def parse_protein_record(record: SeqRecord) -> dict:
+    """Parse a record from a FASTA file and return a list of the protein data.
+    Args:
+        record: Biopython SeqRecord of the protein entry.
+        
+    Returns:
+        A list of the protein data in the order of the regexes below."""
+    regexes = {
+        'protein_id': re.compile(r"\|([^|]*)\|"),     # between | and |
+        'protein_name': re.compile(r"\s(.+?)\sOS"),   # between space and space before OS
+        'species': re.compile(r"OS=(.+?)\sOX"),       # between OS= and space before OX
+        'taxon_id': re.compile(r"OX=(.+?)(\s|$)"),         # between OX= and space
+        'gene': re.compile(r"GN=(.+?)(\s|$)"),             # between GN= and space
+        'pe_level': re.compile(r"PE=(.+?)(\s|$)"),         # between PE= and space
+        'sequence_version': re.compile(r"SV=(.+?)(\s|$)"), # between SV= and space
+        'gene_priority': re.compile(r"GP=(.+?)(\s|$)"),    # between GP= and space
+    }
+    protein_data = {}
+    for key in regexes: # loop through compiled regexes to extract protein data
+        match = regexes[key].search(str(record.description))
+        
+        if match:
+            protein_data[key] = match.group(1)
+        else:
+            if key == 'protein_id':
+                protein_data[key] = str(record.id) # get record.id from FASTA header instead
+            elif key == 'sequence_version':
+                protein_data[key] = '1'
+            elif key in ['pe_level', 'gene_priority']:
+                protein_data[key] = '0' # zeros for integer columns
+            else:
+                protein_data[key] = ''  # empty strings for string columns
 
-    if match:
-        return {
-            "protein_id": match.group(2),
-            "protein_name": match.group(3),
-            "species": match.group(4),
-            "taxon_id": match.group(5),
-            "gene": match.group(6),
-            "pe_level": match.group(7),
-            "sequence_version": match.group(8) if match.group(8) else "",
-            "gene_priority": match.group(9) if match.group(9) else "",
-        }
-    else:
-        raise ValueError(f"Could not parse protein string: {s}")
-
+    return protein_data
