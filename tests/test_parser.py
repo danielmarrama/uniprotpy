@@ -1,9 +1,6 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
-import re
 
 from uniprotpy.parser import parse_proteome
 

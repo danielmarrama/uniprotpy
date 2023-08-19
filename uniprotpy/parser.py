@@ -16,6 +16,7 @@ def parse_proteome(proteome_file) -> dict:
         protein_id = protein_data["protein_id"]
         proteome_dict[protein_id] = protein_data
         proteome_dict[protein_id]["sequence"] = str(record.seq)
+    
     return proteome_dict
 
 
