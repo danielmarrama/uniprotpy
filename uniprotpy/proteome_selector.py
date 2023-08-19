@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-
-import warnings
-warnings.filterwarnings('ignore')
-
 import re
 import os
 import pandas as pd
@@ -27,7 +22,7 @@ class ProteomeSelector:
       outdir: the directory to download the file to.
     """
 
-  def select_proteome(self):
+  def select_best_proteome(self):
     """
     Select the best proteome to use for a species. Return the proteome ID, 
     proteome taxon, and proteome type.
@@ -259,26 +254,3 @@ class ProteomeSelector:
     self._get_proteome_to_fasta(proteome_id)
 
     return proteome_id, proteome_taxon
-
-
-def main():
-  import argparse
-
-  parser = argparse.ArgumentParser()
-
-  parser.add_argument('-t', '--taxon_id', required=True, help='Taxon ID for the species to pull data for.')
-  
-  args = parser.parse_args()
-  taxon_id = args.taxon_id
-
-  Selector = ProteomeSelector(taxon_id)
-  print(f'Number of candidate proteomes: {Selector.num_of_proteomes}')
-  proteome_data = Selector.select_proteome()
-  Selector.proteome_to_csv()
-
-  print(f'Proteome ID: {proteome_data[0]}')
-  print(f'Proteome taxon: {int(proteome_data[1])}')
-  print(f'Proteome type: {proteome_data[2]}')
-
-if __name__ == '__main__':
-  main()
