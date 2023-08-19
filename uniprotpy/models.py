@@ -8,12 +8,11 @@ class UniprotEntry(Base):
     protein_id = Column(String, primary_key=True)
     protein_name = Column(String)
     species = Column(String)
-    # Maybe change to integer? What does this look like for uniprot
-    taxon_id = Column(String)
+    taxon_id = Column(Integer)
     gene = Column(String)
-    pe_level = Column(String)
-    sequence_version = Column(String)
-    gene_priority = Column(String)
+    pe_level = Column(Integer)
+    sequence_version = Column(Integer)
+    gene_priority = Column(Boolean)
     sequence = Column(String)
 
     def dict(self):
